@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA Eyewear - See Beyond</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styles for a more refined look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0A0A0A;
+            color: #EAEAEA;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animation class for scroll-triggered fade-in */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom button style for a premium feel */
+        .btn-premium {
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .btn-premium:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Custom gradient text */
+        .gradient-text {
+            background: linear-gradient(90deg, #FFFFFF, #A0A0A0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Parallax container */
+        .parallax-container {
+            background-image: url('https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2680&auto=format&fit=crop');
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold tracking-wider">AURA</a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#collection" class="hover:text-white transition-colors duration-300">Collection</a>
+                <a href="#philosophy" class="hover:text-white transition-colors duration-300">Philosophy</a>
+                <a href="#lab" class="hover:text-white transition-colors duration-300">Lab</a>
+            </nav>
+            <a href="#" class="hidden md:block bg-white text-black font-semibold px-6 py-3 rounded-full btn-premium">Shop Now</a>
+            <button id="mobile-menu-button" class="md:hidden text-white text-2xl z-50">
+                <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+                 <svg id="menu-close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </header>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-95 backdrop-blur-sm z-40 flex flex-col items-center justify-center space-y-8 text-2xl transform translate-x-full transition-transform duration-500 ease-in-out md:hidden">
+        <a href="#collection" class="mobile-link">Collection</a>
+        <a href="#philosophy" class="mobile-link">Philosophy</a>
+        <a href="#lab" class="mobile-link">Lab</a>
+        <a href="#" class="bg-white text-black font-semibold px-8 py-4 rounded-full mt-8">Shop Now</a>
+    </div>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="h-screen flex flex-col justify-center items-center relative overflow-hidden text-center px-4">
+            <div id="hero-content" class="z-10">
+                <h1 class="text-5xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter mb-4 gradient-text">
+                    See Beyond
+                </h1>
+                <p class="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 mb-8">
+                    AURA crafts visionary eyewear for the modern pioneer. Precision-engineered for clarity, designed for distinction.
+                </p>
+                <a href="#collection" class="bg-white text-black font-semibold px-8 py-4 rounded-full btn-premium inline-block">
+                    Explore The Collection
+                </a>
+            </div>
+            <div id="hero-image-container" class="absolute inset-0 z-0">
+                <img src="https://placehold.co/1200x800/000000/FFFFFF?text=AURA+Model" 
+                     onerror="this.onerror=null;this.src='https://placehold.co/1200x800/000000/FFFFFF?text=Image+Not+Found';"
+                     alt="AURA Eyewear Model"
+                     class="absolute top-1/2 left-1/2 w-auto h-[50vh] md:h-[70vh] max-w-none object-cover"
+                     style="transform: translate(-50%, -50%) scale(1);">
+            </div>
+        </section>
+
+        <!-- Featured Collection -->
+        <section id="collection" class="py-20 md:py-32 bg-[#101010]">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4">The 2025 Collection</h2>
+                    <p class="text-lg text-gray-400 max-w-xl mx-auto">Frames that define the future. A fusion of timeless craft and innovative materials.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Product Card 1 -->
+                    <div class="reveal group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 transform group-hover:scale-105 transition-transform duration-500">
+                            <img src="https://placehold.co/600x700/111111/FFFFFF?text=Orion" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/111111/FFFFFF?text=Image+Error';"
+                                 alt="Orion Glasses" class="w-full h-auto object-cover">
+                        </div>
+                        <h3 class="text-2xl font-semibold">Orion</h3>
+                        <p class="text-gray-400">Titanium frame with photochromic lenses.</p>
+                    </div>
+                    <!-- Product Card 2 -->
+                    <div class="reveal group" style="transition-delay: 0.2s;">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 transform group-hover:scale-105 transition-transform duration-500">
+                            <img src="https://placehold.co/600x700/111111/FFFFFF?text=Nova" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/111111/FFFFFF?text=Image+Error';"
+                                 alt="Nova Glasses" class="w-full h-auto object-cover">
+                        </div>
+                        <h3 class="text-2xl font-semibold">Nova</h3>
+                        <p class="text-gray-400">Bio-acetate construction for sustainable style.</p>
+                    </div>
+                    <!-- Product Card 3 -->
+                    <div class="reveal group" style="transition-delay: 0.4s;">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 transform group-hover:scale-105 transition-transform duration-500">
+                            <img src="https://placehold.co/600x700/111111/FFFFFF?text=Helios" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/111111/FFFFFF?text=Image+Error';"
+                                 alt="Helios Glasses" class="w-full h-auto object-cover">
+                        </div>
+                        <h3 class="text-2xl font-semibold">Helios</h3>
+                        <p class="text-gray-400">Ultra-lightweight design for all-day comfort.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Philosophy Section (Parallax) -->
+        <section id="philosophy" class="parallax-container h-[80vh] flex items-center">
+            <div class="container mx-auto px-6 reveal">
+                <div class="bg-black bg-opacity-50 backdrop-blur-md p-8 md:p-12 rounded-lg max-w-3xl">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4">Our Philosophy</h2>
+                    <p class="text-lg md:text-xl text-gray-200">
+                        We believe eyewear is an extension of the self. It's not just about seeing, but about how you want to be seen. AURA is committed to craftsmanship, innovation, and a design ethos that looks to the future without forgetting the elegance of the past.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mystery Element Section -->
+        <section id="lab" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <div class="reveal">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4">The Visionary Lab</h2>
+                    <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+                        Innovation is at our core. We're currently developing a revolutionary way to experience eyewear online. This is where the future of vision is being built.
+                    </p>
+                    <div class="bg-[#101010] p-8 md:p-16 rounded-lg border border-gray-800 inline-block">
+                        <p class="text-2xl font-semibold text-white">Project: Chimera</p>
+                        <p class="text-gray-400 mt-2">Coming Soon.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="py-20 md:py-32 bg-[#101010]">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl md:text-6xl font-bold">From Our Community</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Testimonial 1 -->
+                    <div class="reveal bg-black p-8 rounded-lg border border-gray-800">
+                        <p class="text-gray-300 mb-4">"The quality is unparalleled. You can feel the craftsmanship the moment you hold them. My Orion frames are my new favorite accessory."</p>
+                        <p class="font-semibold">- Alex R.</p>
+                    </div>
+                    <!-- Testimonial 2 -->
+                    <div class="reveal bg-black p-8 rounded-lg border border-gray-800" style="transition-delay: 0.2s;">
+                        <p class="text-gray-300 mb-4">"Finally, a brand that gets both style and sustainability. The Nova glasses are lightweight, comfortable, and I feel good wearing them."</p>
+                        <p class="font-semibold">- Maya S.</p>
+                    </div>
+                    <!-- Testimonial 3 -->
+                    <div class="reveal bg-black p-8 rounded-lg border border-gray-800" style="transition-delay: 0.4s;">
+                        <p class="text-gray-300 mb-4">"I've received more compliments on my Helios glasses than any other pair I've owned. They are minimalist, yet make a huge statement."</p>
+                        <p class="font-semibold">- Jordan T.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <a href="#" class="text-2xl font-bold tracking-wider text-white mb-4 inline-block">AURA</a>
+            <div class="flex justify-center space-x-6 my-6">
+                <a href="#" class="hover:text-white transition-colors">Instagram</a>
+                <a href="#" class="hover:text-white transition-colors">Twitter</a>
+                <a href="#" class="hover:text-white transition-colors">Facebook</a>
+            </div>
+            <p>&copy; 2025 AURA Eyewear. All Rights Reserved.</p>
+            <p class="text-sm mt-2">Crafted with precision and passion.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- SCROLL-TRIGGERED FADE-IN ANIMATION ---
+            // This adds a 'visible' class to elements with the 'reveal' class
+            // when they enter the viewport, triggering the CSS animation.
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            revealElements.forEach(el => {
+                observer.observe(el);
+            });
+
+            // --- HERO SECTION SCROLL ANIMATION ---
+            // This creates a subtle zoom-out and fade effect on the hero section's
+            // content and image as the user scrolls down.
+            const heroContent = document.getElementById('hero-content');
+            const heroImage = document.querySelector('#hero-image-container img');
+            
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                const heroHeight = document.getElementById('hero').offsetHeight;
+                
+                // Only animate if the user is within the hero section
+                if (scrollY < heroHeight) {
+                    const scrollFraction = scrollY / heroHeight;
+                    
+                    // Animate content opacity and position
+                    heroContent.style.opacity = 1 - scrollFraction * 2;
+                    heroContent.style.transform = `translateY(${scrollY * 0.4}px)`;
+                    
+                    // Animate image scale
+                    const scale = 1 + scrollFraction * 0.2;
+                    heroImage.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                }
+            });
+
+            // --- HEADER BACKGROUND ON SCROLL ---
+            // Adds a background to the header when the user scrolls past a certain point
+            // for better visibility.
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-black', 'bg-opacity-70', 'backdrop-blur-lg', 'shadow-lg');
+                } else {
+                    header.classList.remove('bg-black', 'bg-opacity-70', 'backdrop-blur-lg', 'shadow-lg');
+                }
+            });
+            
+            // --- MOBILE MENU TOGGLE ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOpenIcon = document.getElementById('menu-open-icon');
+            const menuCloseIcon = document.getElementById('menu-close-icon');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            const toggleMenu = () => {
+                mobileMenu.classList.toggle('translate-x-full');
+                menuOpenIcon.classList.toggle('hidden');
+                menuCloseIcon.classList.toggle('hidden');
+                document.body.classList.toggle('overflow-hidden'); // Prevent scrolling when menu is open
+            };
+            
+            mobileMenuButton.addEventListener('click', toggleMenu);
+            
+            // Close menu when a link is clicked
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+        });
+    </script>
+</body>
+</html>

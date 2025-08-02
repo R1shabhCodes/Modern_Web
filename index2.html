@@ -3,107 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURA - Vision, Redefined.</title>
+    <title>AURA Eyewear - A Spatial Experience</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Poppins & Inter -->
+    <!-- GSAP (GreenSock Animation Platform) & ScrollTrigger Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Three.js for 3D rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS & Tailwind Config -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* Custom CSS for specific effects */
+        /* Custom styles for the spatial theme */
         body {
-            background-color: #121212;
-            color: #F5F5F5;
             font-family: 'Inter', sans-serif;
+            background-color: #05040a; /* Deep space blue */
+            color: #EAEAEA;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
         }
-        .font-poppins {
-            font-family: 'Poppins', sans-serif;
-        }
-        .gold-accent {
-            color: #D4AF37;
-        }
-        .bg-gold-accent {
-            background-color: #D4AF37;
-        }
-        .border-gold-accent {
-            border-color: #D4AF37;
-        }
+
+        /* Hero Canvas for 3D object */
         #hero-canvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 5;
+            z-index: 1;
         }
-        .content-layer {
-            position: relative;
-            z-index: 10;
-        }
-        
-        /* Modern Header Style */
-        #header {
-            transition: background-color 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
-        }
-        #header.scrolled {
-            background-color: rgba(18, 18, 18, 0.7);
-            backdrop-filter: blur(10px);
-        }
+
+        /* Cosmic Navbar Animation */
         #header nav a {
             position: relative;
-            transition: color 0.3s ease;
+            font-size: 1.05rem;
+            padding: 0.5rem 0.75rem;
+            margin: 0 0.25rem;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            border-radius: 8px;
+            z-index: 1;
         }
+        
+        /* Cosmic glow effect on hover */
+        #header nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(216, 180, 254, 0.2), rgba(165, 180, 252, 0.1));
+            border-radius: 8px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: 0 0 20px rgba(216, 180, 254, 0.4);
+            z-index: -1;
+        }
+        
+        /* Underline effect */
         #header nav a::after {
             content: '';
             position: absolute;
             width: 0;
             height: 2px;
-            bottom: -4px;
+            bottom: -2px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: #D4AF37;
-            transition: width 0.3s ease;
-        }
-        #header nav a:hover::after {
-            width: 100%;
-        }
-
-        .split-screen-image {
-            background-image: url('https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2980&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(90deg, #d8b4fe, #a5b4fc);
+            transition: width 0.4s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.4s ease;
+            box-shadow: 0 0 5px #d8b4fe;
         }
         
-        /* Product Card & Image Hover */
-        .product-card .product-image-container {
-            position: relative;
-            overflow: hidden;
+        /* Hover animations */
+        #header nav a:hover {
+            color: white;
+            transform: translateY(-3px) scale(1.15);
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            text-shadow: 0 0 10px rgba(216, 180, 254, 0.8);
         }
-        .product-card .product-image {
-            transition: transform 0.5s ease-in-out, opacity 0.4s ease;
-        }
-        .product-card .product-image-hover {
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-        }
-        .product-card:hover .product-image-main {
-            opacity: 0;
-        }
-        .product-card:hover .product-image-hover {
+        
+        #header nav a:hover::before {
             opacity: 1;
-            transform: scale(1.05);
+            transform: scale(1);
         }
-        .product-card:hover .product-info {
+        
+        #header nav a:hover::after {
+            width: 100%;
+            box-shadow: 0 0 10px #d8b4fe, 0 0 20px #a5b4fc;
+        }
+
+        /* Animation class for scroll-triggered fade-in */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1), transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .reveal.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        /* Custom button style with spatial theme hover */
+        .btn-premium {
+            transition: all 0.4s ease;
+            transform-origin: center;
+        }
+        .btn-premium:hover {
+            transform: scale(1.05);
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 10px 30px rgba(192, 132, 252, 0.3); /* Lavender glow */
+        }
+        
+        /* Custom gradient text with spatial colors */
+        .gradient-text {
+            background: linear-gradient(90deg, #FFFFFF, #d8b4fe, #a5b4fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        /* Cosmic About Section with Advanced Effects */
+        .cosmic-about-section {
+            position: relative;
+            overflow: hidden;
+            background-color: #05060f;
+        }
+        
+        /* Background Effects */
+        .cosmic-bg-overlay {
+            background: linear-gradient(145deg, #05060f 0%, #0a0f30 50%, #06152d 100%);
+        }
+        
+        .cosmic-stars {
+            background-image: 
+                radial-gradient(2px 2px at 40px 60px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 20px 50px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 30px 100px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 60px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 90px 90px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 190px 150px, #fff, rgba(0,0,0,0));
+            background-size: 200px 200px;
+            opacity: 0.6;
+            animation: cosmic-stars-animation 60s linear infinite;
+        }
+        
+        .cosmic-nebula {
+            background: 
+                radial-gradient(circle at 50% 50%, rgba(80, 120, 255, 0.08), transparent 40%),
+                radial-gradient(circle at 70% 60%, rgba(60, 100, 255, 0.06), transparent 30%),
+                radial-gradient(circle at 30% 30%, rgba(165, 180, 252, 0.06), transparent 50%);
+            filter: blur(30px);
+            mix-blend-mode: screen;
+            animation: cosmic-nebula-pulse 15s ease-in-out infinite alternate;
+        }
+        
+        /* Title Animation */
+        .cosmic-title {
+            perspective: 800px;
+            transform-style: preserve-3d;
+        }
+        
+        .cosmic-letter {
+            display: inline-block;
+            opacity: 0;
+            transform: rotateY(-90deg) translateY(20px);
+            transform-origin: center center;
+            color: white;
+            text-shadow: 0 0 10px rgba(165, 180, 252, 0.5);
+        }
+        
+        .cosmic-tagline {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .cosmic-tagline-line {
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, rgba(147, 197, 253, 1), rgba(165, 180, 252, 0.5));
+            box-shadow: 0 0 10px rgba(147, 197, 253, 0.7);
+            transition: width 1.5s ease;
+        }
+        
+        /* Cosmic Stats Animation */
+        .cosmic-stats {
+            position: relative;
+        }
+        
+        .cosmic-stat {
+            position: relative;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(147, 197, 253, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            transform: translateY(30px);
+        }
+        
+        /* Orbit Animation for Background Visual Element */
+        .cosmic-orbit-bg {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            z-index: 5;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .cosmic-orbit-container {
+            position: absolute;
+            top: 50%;
+            right: -200px;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            opacity: 0.7;
+        }
+        
+        .cosmic-orbit {
+            position: absolute;
+            border: 1px solid rgba(165, 180, 252, 0.3);
+            border-radius: 50%;
+            transform-style: preserve-3d;
+        }
+        
+        .orbit-1 {
+            width: 300px;
+            height: 300px;
+            animation: orbit 12s linear infinite;
+        }
+        
+        .orbit-2 {
+            width: 500px;
+            height: 500px;
+            animation: orbit 20s linear infinite reverse;
+        }
+        
+        .orbit-3 {
+            width: 700px;
+            height: 700px;
+            animation: orbit 30s linear infinite;
+        }
+        
+        .cosmic-planet {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(165, 180, 252, 0.5);
+        }
+        
+        .planet-1 {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(to right, #a5b4fc, #93c5fd);
+            left: -10px;
+            top: calc(50% - 10px);
+        }
+        
+        .planet-2 {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(to right, #818cf8, #60a5fa);
+            left: -15px;
+            top: calc(50% - 15px);
+        }
+        
+        .planet-3 {
+            width: 15px;
+            height: 15px;
+            background: linear-gradient(to right, #c7d2fe, #93c5fd);
+            left: -7.5px;
+            top: calc(50% - 7.5px);
+        }
+        
+        .cosmic-core {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at center, rgba(165, 180, 252, 0.7) 0%, rgba(99, 102, 241, 0.4) 50%, rgba(79, 70, 229, 0.2) 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 40px rgba(165, 180, 252, 0.6),
+                0 0 80px rgba(79, 70, 229, 0.3);
+            animation: pulse-core 4s ease-in-out infinite alternate;
+        }
+        
+        /* Animations for About Section */
+        @keyframes cosmic-stars-animation {
+            0% { background-position: 0 0; }
+            100% { background-position: 200px 200px; }
+        }
+        
+        @keyframes cosmic-nebula-pulse {
+            0% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.2); }
+            100% { opacity: 0.4; transform: scale(1); }
+        }
+        
+        @keyframes orbit {
+            0% { transform: rotateZ(0) rotateY(65deg); }
+            100% { transform: rotateZ(360deg) rotateY(65deg); }
+        }
+        
+        @keyframes pulse-core {
+            0% { transform: scale(1); box-shadow: 0 0 30px rgba(216, 180, 254, 0.7), 0 0 60px rgba(165, 180, 252, 0.4); }
+            100% { transform: scale(1.1); box-shadow: 0 0 40px rgba(216, 180, 254, 0.9), 0 0 80px rgba(165, 180, 252, 0.6); }
+        }
+        
+        /* Gradient overlay to prevent text merging */
+        .hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(5, 4, 10, 1) 10%, rgba(5, 4, 10, 0) 100%);
+            z-index: 2;
+        }
+
+        /* Collection Image Hover Effect */
+        .product-image {
+            filter: grayscale(100%);
+            transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        .group:hover .product-image {
+            filter: grayscale(0%);
+            transform: scale(1.05);
         }
 
         /* Infinite Marquee */
@@ -114,167 +352,297 @@
         .marquee-container {
             overflow: hidden;
             width: 100%;
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
         }
         .marquee-track {
             display: flex;
             width: fit-content;
-            animation: scroll-left 40s linear infinite;
+            animation: scroll-left 20s linear infinite;
         }
         .marquee-container:hover .marquee-track {
             animation-play-state: paused;
         }
         .marquee-track > * {
             flex-shrink: 0;
-            width: 350px; /* Fixed width for each card */
-            margin: 0 1rem;
+            width: clamp(300px, 30vw, 400px);
+            margin: 0 1.5rem;
         }
-
-        /* GSAP Animation initial states */
-        .gsap-reveal {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(50px);
+        
+        /* Space-themed ripple effect styles */
+        .ripple-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 999;
         }
-        .gsap-reveal-left {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-50px);
+        
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle, 
+                rgba(216, 180, 254, 0.3) 0%, 
+                rgba(165, 180, 252, 0.2) 40%, 
+                rgba(255, 255, 255, 0) 70%
+            );
+            transform: scale(0);
+            opacity: 0.8;
+            pointer-events: none;
+            will-change: transform, opacity;
+            z-index: 1000;
         }
-        .gsap-reveal-right {
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(50px);
+        
+        .cosmic-particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(0);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes particleDrift {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(var(--x), var(--y)) rotate(var(--r));
+                opacity: 0;
+            }
+        }
+        
+        /* Pulsing glow animation for navbar links */
+        @keyframes pulseGlow {
+            0% {
+                text-shadow: 0 0 5px rgba(216, 180, 254, 0.5), 0 0 10px rgba(165, 180, 252, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 10px rgba(216, 180, 254, 0.8), 0 0 20px rgba(165, 180, 252, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
+            }
         }
     </style>
 </head>
-<body class="antialiased">
-
+<body class="overflow-x-hidden">
+    <!-- Ripple Effect Container -->
+    <div class="ripple-container"></div>
+    
     <!-- Header -->
-    <header id="header" class="content-layer fixed top-0 left-0 w-full p-6 md:p-8 flex justify-between items-center z-50">
-        <a href="#" class="font-poppins font-bold text-2xl tracking-wider">AURA</a>
-        <nav class="hidden md:flex items-center space-x-8">
-            <a href="#about" class="hover:text-white">About</a>
-            <a href="#products" class="hover:text-white">Products</a>
-            <a href="#technology" class="hover:text-white">Technology</a>
-            <a href="#contact" class="hover:text-white">Contact</a>
-        </nav>
-        <button class="md:hidden text-2xl">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold tracking-wider">AURA</a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#collection" class="hover:text-white">Collection</a>
+                <a href="#philosophy" class="hover:text-white">Philosophy</a>
+                <a href="#lab" class="hover:text-white">Lab</a>
+            </nav>
+            <a href="#" class="hidden md:block bg-white text-black font-semibold px-6 py-3 rounded-full btn-premium">Shop Now</a>
+            <button id="mobile-menu-button" class="md:hidden text-white text-2xl z-50">
+                <svg id="menu-open-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+                 <svg id="menu-close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
     </header>
+    
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-lg z-40 flex flex-col items-center justify-center space-y-8 text-2xl transform translate-x-full transition-transform duration-500 ease-in-out md:hidden">
+        <a href="#collection" class="mobile-link">Collection</a>
+        <a href="#philosophy" class="mobile-link">Philosophy</a>
+        <a href="#lab" class="mobile-link">Lab</a>
+        <a href="#" class="bg-white text-black font-semibold px-8 py-4 rounded-full mt-8">Shop Now</a>
+    </div>
 
     <main>
         <!-- Hero Section -->
-        <section id="hero" class="h-screen w-full relative flex items-center justify-center text-center">
-            <div id="hero-canvas-container" class="absolute top-0 left-0 w-full h-full">
-                <canvas id="hero-canvas"></canvas>
-            </div>
-            <div class="content-layer text-white">
-                <h1 class="font-poppins font-extrabold text-6xl md:text-8xl lg:text-9xl tracking-tighter leading-none gsap-reveal">
-                    VISION
+        <section id="hero" class="h-screen flex flex-col justify-center items-center relative overflow-hidden text-center px-4">
+            <canvas id="hero-canvas"></canvas>
+            <div id="hero-content" class="z-10 relative">
+                <h1 class="text-5xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter mb-4 gradient-text">
+                    See Beyond
                 </h1>
-                <h2 class="font-poppins font-extrabold text-6xl md:text-8xl lg:text-9xl tracking-tighter gold-accent gsap-reveal">
-                    REDEFINED.
-                </h2>
-                <p class="mt-4 text-lg md:text-xl max-w-2xl mx-auto gsap-reveal">
-                    Experience clarity through the lens of innovation. Premium eyewear crafted for the modern pioneer.
+                <p class="max-w-2xl mx-auto text-lg md:text-xl text-gray-300 mb-8">
+                    AURA crafts visionary eyewear for the modern pioneer. Precision-engineered for clarity, designed for distinction.
                 </p>
+                <a href="#collection" class="bg-white text-black font-semibold px-8 py-4 rounded-full btn-premium inline-block">
+                    Explore The Collection
+                </a>
             </div>
+            <div class="hero-overlay"></div>
         </section>
 
-        <!-- About Section -->
-        <section id="about" class="py-20 md:py-32 bg-[#1a1a1a]">
-            <div class="container mx-auto px-6 md:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                    <div class="h-96 md:h-[60vh] rounded-lg overflow-hidden gsap-reveal-left">
-                         <div class="split-screen-image w-full h-full"></div>
-                    </div>
-                    <div class="gsap-reveal-right">
-                        <h2 class="font-poppins font-bold text-4xl md:text-5xl">The AURA Philosophy</h2>
-                        <p class="mt-6 text-lg text-gray-300">
-                            We believe eyewear is more than a tool; it's a piece of personal architecture. AURA was founded on the principle of merging advanced optical technology with timeless design. We don't just create glasses, we craft perspectives.
-                        </p>
-                        <p class="mt-4 text-lg text-gray-300">
-                            Every frame is meticulously engineered from next-generation materials for unparalleled comfort, durability, and style.
-                        </p>
-                        <a href="#technology" class="inline-block mt-8 px-8 py-3 bg-transparent border-2 border-gold-accent text-gold-accent font-bold rounded-full hover:bg-gold-accent hover:text-black transition-all duration-300">Our Craftsmanship</a>
-                    </div>
+        <!-- Featured Collection -->
+        <section id="collection" class="py-20 md:py-32 bg-[#08070d]">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4">The 2025 Collection</h2>
+                    <p class="text-lg text-gray-400 max-w-xl mx-auto">Frames that define the future. A fusion of timeless craft and innovative materials.</p>
                 </div>
             </div>
-        </section>
-
-        <!-- Products Section -->
-        <section id="products" class="py-20 md:py-32">
-            <div class="container mx-auto px-6 md:px-8 text-center">
-                <h2 class="font-poppins font-bold text-4xl md:text-5xl gsap-reveal">Our Collection</h2>
-                <p class="mt-4 text-lg text-gray-300 max-w-3xl mx-auto gsap-reveal">
-                    A curated selection of frames designed to complement your world. Explore our signature styles.
-                </p>
-            </div>
-            <div class="mt-16 marquee-container gsap-reveal">
+            <div class="marquee-container reveal">
                 <div class="marquee-track">
-                    <!-- Products duplicated for infinite effect -->
-                    <!-- Set 1 -->
-                    <div class="product-card group">
-                        <div class="bg-[#1a1a1a] rounded-lg overflow-hidden relative product-image-container">
-                            <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800" alt="Eyewear Model 1" class="product-image product-image-main w-full h-auto">
-                            <img src="https://images.unsplash.com/photo-1577803645773-f1245c4b3e98?q=80&w=800" alt="Eyewear Model 1 Hover" class="product-image product-image-hover w-full h-auto">
-                            <div class="product-info absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transform translateY-4 transition-all duration-500">
-                                <h3 class="font-poppins font-bold text-2xl text-white">The Nomad</h3>
-                                <p class="text-gray-300">Titanium Frame | Solar Pro Lenses</p>
-                            </div>
+                    <!-- Product Cards Set 1 -->
+                    <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Orion';"
+                                 alt="Orion Black Glasses" class="w-full h-auto object-cover product-image">
                         </div>
+                        <h3 class="text-2xl font-semibold">Orion</h3>
+                        <p class="text-gray-400">Titanium frame with photochromic lenses.</p>
                     </div>
-                    <div class="product-card group">
-                        <div class="bg-[#1a1a1a] rounded-lg overflow-hidden relative product-image-container">
-                            <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=800" alt="Eyewear Model 2" class="product-image product-image-main w-full h-auto">
-                            <img src="https://images.unsplash.com/photo-1620138546344-7b2c385a46e8?q=80&w=800" alt="Eyewear Model 2 Hover" class="product-image product-image-hover w-full h-auto">
-                            <div class="product-info absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transform translateY-4 transition-all duration-500">
-                                <h3 class="font-poppins font-bold text-2xl text-white">The Scholar</h3>
-                                <p class="text-gray-300">Bio-Acetate | ClearView Lenses</p>
-                            </div>
+                    <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1511389026282-721593a14357?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Nova';"
+                                 alt="Nova Black Glasses" class="w-full h-auto object-cover product-image">
                         </div>
+                        <h3 class="text-2xl font-semibold">Nova</h3>
+                        <p class="text-gray-400">Bio-acetate construction for sustainable style.</p>
                     </div>
-                    <div class="product-card group">
-                        <div class="bg-[#1a1a1a] rounded-lg overflow-hidden relative product-image-container">
-                            <img src="https://images.unsplash.com/photo-1614715838556-969c4175304e?q=80&w=800" alt="Eyewear Model 3" class="product-image product-image-main w-full h-auto">
-                            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7539?q=80&w=800" alt="Eyewear Model 3 Hover" class="product-image product-image-hover w-full h-auto">
-                            <div class="product-info absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transform translateY-4 transition-all duration-500">
-                                <h3 class="font-poppins font-bold text-2xl text-white">The Aviator</h3>
-                                <p class="text-gray-300">Aero-Grade Steel | SkyTint Lenses</p>
-                            </div>
+                    <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1614715838557-82741d78beb2?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Helios';"
+                                 alt="Helios Black Glasses" class="w-full h-auto object-cover product-image">
                         </div>
+                        <h3 class="text-2xl font-semibold">Helios</h3>
+                        <p class="text-gray-400">Ultra-lightweight design for all-day comfort.</p>
                     </div>
-                    <!-- Set 2 (Duplicate) -->
-                    <div class="product-card group">
-                        <div class="bg-[#1a1a1a] rounded-lg overflow-hidden relative product-image-container">
-                            <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800" alt="Eyewear Model 1" class="product-image product-image-main w-full h-auto">
-                            <img src="https://images.unsplash.com/photo-1577803645773-f1245c4b3e98?q=80&w=800" alt="Eyewear Model 1 Hover" class="product-image product-image-hover w-full h-auto">
-                            <div class="product-info absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transform translateY-4 transition-all duration-500">
-                                <h3 class="font-poppins font-bold text-2xl text-white">The Nomad</h3>
-                                <p class="text-gray-300">Titanium Frame | Solar Pro Lenses</p>
-                            </div>
+                     <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7539?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Lyra';"
+                                 alt="Lyra Black Glasses" class="w-full h-auto object-cover product-image">
                         </div>
+                        <h3 class="text-2xl font-semibold">Lyra</h3>
+                        <p class="text-gray-400">A bold silhouette for the modern visionary.</p>
                     </div>
-                    <div class="product-card group">
-                        <div class="bg-[#1a1a1a] rounded-lg overflow-hidden relative product-image-container">
-                            <img src="https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=800" alt="Eyewear Model 2" class="product-image product-image-main w-full h-auto">
-                            <img src="https://images.unsplash.com/photo-1620138546344-7b2c385a46e8?q=80&w=800" alt="Eyewear Model 2 Hover" class="product-image product-image-hover w-full h-auto">
-                            <div class="product-info absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transform translateY-4 transition-all duration-500">
-                                <h3 class="font-poppins font-bold text-2xl text-white">The Scholar</h3>
-                                <p class="text-gray-300">Bio-Acetate | ClearView Lenses</p>
-                            </div>
+
+                    <!-- Product Cards Set 2 (Duplicates for infinite loop) -->
+                    <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1572635196237-14b3f281503f?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Orion';"
+                                 alt="Orion Black Glasses" class="w-full h-auto object-cover product-image">
                         </div>
+                        <h3 class="text-2xl font-semibold">Orion</h3>
+                        <p class="text-gray-400">Titanium frame with photochromic lenses.</p>
                     </div>
-                    <div class="product-card group">
-                        <div class="bg-[#1a1a1a] rounded-lg overflow-hidden relative product-image-container">
-                            <img src="https://images.unsplash.com/photo-1614715838556-969c4175304e?q=80&w=800" alt="Eyewear Model 3" class="product-image product-image-main w-full h-auto">
-                            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7539?q=80&w=800" alt="Eyewear Model 3 Hover" class="product-image product-image-hover w-full h-auto">
-                            <div class="product-info absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transform translateY-4 transition-all duration-500">
-                                <h3 class="font-poppins font-bold text-2xl text-white">The Aviator</h3>
-                                <p class="text-gray-300">Aero-Grade Steel | SkyTint Lenses</p>
+                    <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1511389026282-721593a14357?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Nova';"
+                                 alt="Nova Black Glasses" class="w-full h-auto object-cover product-image">
+                        </div>
+                        <h3 class="text-2xl font-semibold">Nova</h3>
+                        <p class="text-gray-400">Bio-acetate construction for sustainable style.</p>
+                    </div>
+                    <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1614715838557-82741d78beb2?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Helios';"
+                                 alt="Helios Black Glasses" class="w-full h-auto object-cover product-image">
+                        </div>
+                        <h3 class="text-2xl font-semibold">Helios</h3>
+                        <p class="text-gray-400">Ultra-lightweight design for all-day comfort.</p>
+                    </div>
+                     <div class="group">
+                        <div class="bg-black rounded-lg overflow-hidden mb-4 shadow-2xl shadow-purple-900/10">
+                            <img src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7539?q=80&w=800&auto=format&fit=crop" 
+                                 onerror="this.onerror=null;this.src='https://placehold.co/600x700/000000/FFFFFF?text=Lyra';"
+                                 alt="Lyra Black Glasses" class="w-full h-auto object-cover product-image">
+                        </div>
+                        <h3 class="text-2xl font-semibold">Lyra</h3>
+                        <p class="text-gray-400">A bold silhouette for the modern visionary.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Us Section (Cosmic Experience) -->
+        <section id="philosophy" class="cosmic-about-section h-[100vh] flex items-center relative overflow-hidden">
+            <div class="cosmic-bg-overlay absolute inset-0 z-0"></div>
+            <div class="cosmic-stars absolute inset-0 z-10"></div>
+            <div class="cosmic-nebula absolute inset-0 z-5"></div>
+            
+            <!-- Cosmic Orbit Background -->
+            <div class="cosmic-orbit-bg absolute right-0 top-0 bottom-0 w-2/3 z-5">
+                <div class="cosmic-orbit-container absolute inset-0 flex items-center justify-center">
+                    <div class="cosmic-orbit orbit-1">
+                        <div class="cosmic-planet planet-1"></div>
+                    </div>
+                    <div class="cosmic-orbit orbit-2">
+                        <div class="cosmic-planet planet-2"></div>
+                    </div>
+                    <div class="cosmic-orbit orbit-3">
+                        <div class="cosmic-planet planet-3"></div>
+                    </div>
+                    <div class="cosmic-core"></div>
+                </div>
+            </div>
+            
+            <div class="container relative z-20 px-6 mx-auto">
+                <div class="grid grid-cols-1 lg:grid-cols-1 gap-12 items-center">
+                    <!-- Text Content -->
+                    <div class="about-text-content space-y-6 max-w-3xl">
+                        <h2 class="cosmic-title text-4xl md:text-6xl font-bold tracking-tight">
+                            <span class="cosmic-letter">A</span>
+                            <span class="cosmic-letter">b</span>
+                            <span class="cosmic-letter">o</span>
+                            <span class="cosmic-letter">u</span>
+                            <span class="cosmic-letter">t</span>
+                            <span class="cosmic-letter">&nbsp;</span>
+                            <span class="cosmic-letter">A</span>
+                            <span class="cosmic-letter">U</span>
+                            <span class="cosmic-letter">R</span>
+                            <span class="cosmic-letter">A</span>
+                        </h2>
+                        
+                        <div class="cosmic-tagline text-xl md:text-2xl text-blue-300 font-semibold mb-4 opacity-0">
+                            Pioneering The Future of Vision
+                            <span class="cosmic-tagline-line"></span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <p class="cosmic-paragraph text-lg md:text-xl text-gray-200 opacity-0">
+                                Founded in 2023, AURA emerged from a simple belief: eyewear should transcend function to become an expression of identity. Our team of visionary designers and optical engineers blend cutting-edge technology with timeless aesthetics.
+                            </p>
+                            
+                            <p class="cosmic-paragraph text-lg md:text-xl text-gray-200 opacity-0">
+                                We believe eyewear is an extension of the self. It's not just about seeing, but about how you want to be seen. AURA is committed to craftsmanship, innovation, and a design ethos that looks to the future without forgetting the elegance of the past.
+                            </p>
+                            
+                            <div class="cosmic-stats grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                                <div class="cosmic-stat opacity-0">
+                                    <div class="text-3xl font-bold text-blue-300 cosmic-counter" data-target="24">0</div>
+                                    <div class="text-sm uppercase tracking-wider text-gray-400">Countries</div>
+                                </div>
+                                <div class="cosmic-stat opacity-0">
+                                    <div class="text-3xl font-bold text-blue-300 cosmic-counter" data-target="85">0</div>
+                                    <div class="text-sm uppercase tracking-wider text-gray-400">Design Awards</div>
+                                </div>
+                                <div class="cosmic-stat opacity-0">
+                                    <div class="text-3xl font-bold text-blue-300 cosmic-counter" data-target="12">0</div>
+                                    <div class="text-sm uppercase tracking-wider text-gray-400">Patents</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -282,186 +650,495 @@
             </div>
         </section>
 
-        <!-- Technology Section -->
-        <section id="technology" class="py-20 md:py-32 bg-[#1a1a1a] text-center">
-            <div class="container mx-auto px-6 md:px-8">
-                <h2 class="font-poppins font-bold text-4xl md:text-5xl gsap-reveal">Innovation in Sight</h2>
-                <p class="mt-4 text-lg text-gray-300 max-w-3xl mx-auto gsap-reveal">
-                    Our commitment to technology is absolute. Each pair of AURA glasses is an assembly of cutting-edge materials and optical science, designed for a singular purpose: perfect clarity.
-                </p>
-                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
-                    <div class="gsap-reveal">
-                        <h3 class="font-poppins font-bold text-2xl gold-accent">AURA Lenses</h3>
-                        <p class="mt-2 text-gray-400">Multi-layered coatings reduce glare, filter 100% of UV rays, and resist scratches and smudges, providing a pristine visual experience in any condition.</p>
-                    </div>
-                    <div class="gsap-reveal">
-                        <h3 class="font-poppins font-bold text-2xl gold-accent">Frame Materials</h3>
-                        <p class="mt-2 text-gray-400">From feather-light Japanese titanium to sustainable bio-acetate, our frames are selected for their superior strength, flexibility, and comfort.</p>
-                    </div>
-                    <div class="gsap-reveal">
-                        <h3 class="font-poppins font-bold text-2xl gold-accent">Precision Fit</h3>
-                        <p class="mt-2 text-gray-400">Ergonomically designed and balanced for weight distribution, AURA frames feel custom-made, ensuring they remain comfortable all day long.</p>
+        <!-- Lab Section -->
+        <section id="lab" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 text-center">
+                <div class="reveal">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4">The Visionary Lab</h2>
+                    <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
+                        Innovation is at our core. We're currently developing a revolutionary way to experience eyewear online. This is where the future of vision is being built.
+                    </p>
+                    <div class="bg-[#08070d] p-8 md:p-16 rounded-lg border border-purple-400/20 inline-block shadow-2xl shadow-purple-900/20">
+                        <p class="text-2xl font-semibold text-white">Project: Chimera</p>
+                        <p class="text-gray-400 mt-2">Coming Soon.</p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="py-20 md:py-32">
-            <div class="container mx-auto px-6 md:px-8 text-center">
-                <h2 class="font-poppins font-bold text-4xl md:text-5xl gsap-reveal">Join The Vision</h2>
-                <p class="mt-4 text-lg text-gray-300 max-w-2xl mx-auto gsap-reveal">
-                    Stay ahead of the curve. Receive updates on new collections, exclusive events, and the future of vision.
-                </p>
-                <form class="mt-12 max-w-xl mx-auto gsap-reveal">
-                    <div class="flex flex-col md:flex-row gap-4">
-                        <input type="email" placeholder="Enter your email" class="w-full px-6 py-4 bg-[#1a1a1a] border-2 border-gray-700 rounded-full focus:outline-none focus:border-gold-accent transition-colors duration-300 text-white">
-                        <button type="submit" class="w-full md:w-auto px-8 py-4 bg-gold-accent text-black font-bold rounded-full hover:bg-yellow-500 transition-colors duration-300 whitespace-nowrap">Subscribe</button>
-                    </div>
-                </form>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="py-12 bg-[#0a0a0a]">
-        <div class="container mx-auto px-6 md:px-8 text-center text-gray-500">
-            <p class="font-poppins text-lg">AURA</p>
-            <p class="mt-2 text-sm">&copy; 2025 AURA Eyewear. All Rights Reserved. A concept by a creative AI.</p>
-            <div class="mt-6 flex justify-center space-x-6">
-                <a href="#" class="hover:text-gold-accent transition-colors duration-300">Instagram</a>
-                <a href="#" class="hover:text-gold-accent transition-colors duration-300">Twitter</a>
-                <a href="#" class="hover:text-gold-accent transition-colors duration-300">Facebook</a>
+    <footer class="bg-black py-12">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <a href="#" class="text-2xl font-bold tracking-wider text-white mb-4 inline-block">AURA</a>
+            <div class="flex justify-center space-x-6 my-6">
+                <a href="#" class="hover:text-blue-400 transition-colors">Instagram</a>
+                <a href="#" class="hover:text-blue-400 transition-colors">Twitter</a>
+                <a href="#" class="hover:text-blue-400 transition-colors">Facebook</a>
             </div>
+            <p>&copy; 2025 AURA Eyewear. All Rights Reserved.</p>
+            <p class="text-sm mt-2">Crafted with precision and passion.</p>
         </div>
     </footer>
 
-    <!-- GSAP & Three.js Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/ScrollTrigger.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-    <!-- Main Application Logic -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            // --- 0. MODERN HEADER SCROLL EFFECT ---
-            const header = document.getElementById('header');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            });
 
-            // --- 1. GSAP SCROLL ANIMATIONS ---
+        document.addEventListener('DOMContentLoaded', () => {
             gsap.registerPlugin(ScrollTrigger);
 
-            const revealElements = document.querySelectorAll('.gsap-reveal');
-            revealElements.forEach(el => {
-                gsap.fromTo(el, 
-                    { opacity: 0, y: 50, visibility: 'hidden' },
-                    { 
-                        opacity: 1, y: 0, visibility: 'visible',
-                        duration: 1, ease: 'power3.out',
-                        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-                    }
-                );
-            });
-            
-            const revealLeftElements = document.querySelectorAll('.gsap-reveal-left');
-            revealLeftElements.forEach(el => {
-                gsap.fromTo(el, 
-                    { opacity: 0, x: -50, visibility: 'hidden' },
-                    { 
-                        opacity: 1, x: 0, visibility: 'visible',
-                        duration: 1.2, ease: 'power3.out',
-                        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-                    }
-                );
+            // --- HERO SECTION 3D & SCROLL ---
+            gsap.to("#hero-content", {
+                yPercent: 50,
+                opacity: 0,
+                scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: 1.5 }
             });
 
-            const revealRightElements = document.querySelectorAll('.gsap-reveal-right');
-            revealRightElements.forEach(el => {
-                gsap.fromTo(el, 
-                    { opacity: 0, x: 50, visibility: 'hidden' },
-                    { 
-                        opacity: 1, x: 0, visibility: 'visible',
-                        duration: 1.2, ease: 'power3.out',
-                        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-                    }
-                );
-            });
-
-
-            // --- 2. THREE.JS HERO SCENE ---
-            let scene, camera, renderer, model;
-            const container = document.getElementById('hero-canvas-container');
+            // --- THREE.JS HERO SCENE: Asteroid Field ---
+            let scene, camera, renderer, asteroids = [];
+            const heroSection = document.getElementById('hero');
 
             function initThree() {
                 scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-                camera.position.z = 5;
+                camera = new THREE.PerspectiveCamera(75, heroSection.clientWidth / heroSection.clientHeight, 0.1, 1000);
+                camera.position.z = 10;
                 renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
-                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setSize(heroSection.clientWidth, heroSection.clientHeight);
                 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-                const geometry = new THREE.TorusKnotGeometry(1.5, 0.3, 200, 20);
-                const material = new THREE.MeshStandardMaterial({
-                    color: 0xD4AF37, wireframe: true, metalness: 0.7, roughness: 0.2
-                });
-                model = new THREE.Mesh(geometry, material);
-                scene.add(model);
-
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
                 scene.add(ambientLight);
-                const pointLight = new THREE.PointLight(0xffffff, 1);
-                pointLight.position.set(5, 5, 5);
+                const pointLight = new THREE.PointLight(0xd8b4fe, 1.5);
+                pointLight.position.set(10, 10, 10);
                 scene.add(pointLight);
 
+                // Create Asteroids
+                const asteroidMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x9370DB,
+                    metalness: 0.6,
+                    roughness: 0.8
+                });
+
+                for (let i = 0; i < 300; i++) {
+                    const size = Math.random() * 0.2 + 0.05;
+                    const asteroidGeometry = new THREE.IcosahedronGeometry(size, 0);
+                    const asteroid = new THREE.Mesh(asteroidGeometry, asteroidMaterial);
+                    asteroid.position.x = (Math.random() - 0.5) * 40;
+                    asteroid.position.y = (Math.random() - 0.5) * 40;
+                    asteroid.position.z = (Math.random() - 0.5) * 40;
+                    asteroid.rotation.x = Math.random() * 2 * Math.PI;
+                    asteroid.rotation.y = Math.random() * 2 * Math.PI;
+                    asteroids.push(asteroid);
+                    scene.add(asteroid);
+                }
+
                 window.addEventListener('resize', onWindowResize, false);
-                document.addEventListener('mousemove', onMouseMove, false);
                 animate();
             }
 
             function animate() {
                 requestAnimationFrame(animate);
+                // Animate asteroids
+                asteroids.forEach(asteroid => {
+                    asteroid.position.x -= 0.02;
+                    asteroid.position.y -= 0.01;
+                    asteroid.rotation.x += 0.005;
+                    asteroid.rotation.y += 0.005;
+                    // Reset asteroid position for looping effect
+                    if (asteroid.position.x < -20 || asteroid.position.y < -20) {
+                        asteroid.position.x = 20;
+                        asteroid.position.y = Math.random() * 20;
+                    }
+                });
                 renderer.render(scene, camera);
             }
 
             function onWindowResize() {
-                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.aspect = heroSection.clientWidth / heroSection.clientHeight;
                 camera.updateProjectionMatrix();
-                renderer.setSize(container.clientWidth, container.clientHeight);
+                renderer.setSize(heroSection.clientWidth, heroSection.clientHeight);
             }
-            
-            let mouseX = 0, mouseY = 0;
-            let targetX = 0, targetY = 0;
-            const windowHalfX = window.innerWidth / 2;
-            const windowHalfY = window.innerHeight / 2;
-
-            function onMouseMove(event) {
-                mouseX = (event.clientX - windowHalfX);
-                mouseY = (event.clientY - windowHalfY);
-            }
-            
-            const clock = new THREE.Clock();
-            const tick = () => {
-                targetX = mouseX * .001;
-                targetY = mouseY * .001;
-                const elapsedTime = clock.getElapsedTime();
-                if (model) {
-                    model.rotation.y = .5 * elapsedTime;
-                    model.rotation.y += .5 * (targetX - model.rotation.y);
-                    model.rotation.x += .5 * (targetY - model.rotation.x);
-                    model.position.z += .5 * (targetY - model.rotation.x);
-                }
-                window.requestAnimationFrame(tick);
-            }
-            tick();
 
             initThree();
+
+            // --- SCROLL-TRIGGERED FADE-IN ANIMATION ---
+            const revealElements = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            revealElements.forEach(el => {
+                observer.observe(el);
+            });
+            
+            // --- COSMIC ABOUT SECTION ANIMATIONS ---
+            function initCosmicAboutSection() {
+                // Title letters animation
+                const cosmicLetters = document.querySelectorAll('.cosmic-letter');
+                gsap.to(cosmicLetters, {
+                    rotateY: 0,
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.1,
+                    duration: 1.2,
+                    ease: "back.out(1.7)",
+                    scrollTrigger: {
+                        trigger: '.cosmic-title',
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+                
+                // Tagline animation
+                gsap.to('.cosmic-tagline', {
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: '.cosmic-tagline',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none'
+                    },
+                    onComplete: () => {
+                        // Animate the line under the tagline
+                        const taglineLine = document.querySelector('.cosmic-tagline-line');
+                        if (taglineLine) {
+                            gsap.to(taglineLine, {
+                                width: '100%',
+                                duration: 1.5,
+                                ease: "power2.out"
+                            });
+                        }
+                    }
+                });
+                
+                // Paragraph animations
+                const paragraphs = document.querySelectorAll('.cosmic-paragraph');
+                gsap.to(paragraphs, {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.4,
+                    duration: 1,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: paragraphs[0],
+                        start: 'top 75%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+                
+                // Stats animation
+                const stats = document.querySelectorAll('.cosmic-stat');
+                gsap.to(stats, {
+                    opacity: 1,
+                    y: 0,
+                    stagger: 0.2,
+                    duration: 0.8,
+                    ease: "back.out(1.7)",
+                    scrollTrigger: {
+                        trigger: '.cosmic-stats',
+                        start: 'top 80%',
+                        toggleActions: 'play none none none'
+                    },
+                    onComplete: () => {
+                        // Animate counter numbers
+                        animateCounters();
+                    }
+                });
+                
+                // Visual orbit element animation
+                gsap.to('.cosmic-orbit-bg', {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1.5,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: '.cosmic-about-section',
+                        start: 'top 75%',
+                        toggleActions: 'play none none none'
+                    }
+                });
+            }
+            
+            // Counter animation function
+            function animateCounters() {
+                const counters = document.querySelectorAll('.cosmic-counter');
+                const speed = 200; // Lower number = faster animation
+                
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    const increment = target / speed;
+                    
+                    const updateCount = () => {
+                        const count = +counter.innerText;
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + increment);
+                            setTimeout(updateCount, 20);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    };
+                    
+                    updateCount();
+                });
+            }
+            
+            // Initialize cosmic about section
+            initCosmicAboutSection();
+            
+            // --- HEADER BACKGROUND ON SCROLL ---
+            const header = document.getElementById('header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('bg-black/60', 'backdrop-blur-lg', 'shadow-lg');
+                } else {
+                    header.classList.remove('bg-black/60', 'backdrop-blur-lg', 'shadow-lg');
+                }
+            });
+            
+            // --- MOBILE MENU TOGGLE ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOpenIcon = document.getElementById('menu-open-icon');
+            const menuCloseIcon = document.getElementById('menu-close-icon');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            const toggleMenu = () => {
+                mobileMenu.classList.toggle('translate-x-full');
+                menuOpenIcon.classList.toggle('hidden');
+                menuCloseIcon.classList.toggle('hidden');
+                document.body.classList.toggle('overflow-hidden');
+            };
+            
+            mobileMenuButton.addEventListener('click', toggleMenu);
+            
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+            
+            // --- COSMIC NAVBAR EFFECTS ---
+            const navLinks = document.querySelectorAll('#header nav a');
+            
+            // Add cosmic star particles to navbar links on hover
+            navLinks.forEach(link => {
+                link.addEventListener('mouseenter', (e) => {
+                    // Create micro star burst effect
+                    createNavStarBurst(e.target);
+                    
+                    // Add subtle pulsing glow animation
+                    link.style.animation = 'pulseGlow 1.5s infinite alternate';
+                });
+                
+                link.addEventListener('mouseleave', (e) => {
+                    // Remove animation when not hovering
+                    link.style.animation = '';
+                });
+            });
+            
+            // Creates a cosmic starburst effect around navbar items
+            function createNavStarBurst(element) {
+                const rect = element.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                // Create 8-12 micro stars
+                const starCount = Math.floor(Math.random() * 5) + 8;
+                
+                for (let i = 0; i < starCount; i++) {
+                    const microStar = document.createElement('div');
+                    microStar.className = 'cosmic-particle';
+                    
+                    // Tiny stars (0.5-2px)
+                    const size = Math.random() * 1.5 + 0.5;
+                    microStar.style.width = `${size}px`;
+                    microStar.style.height = `${size}px`;
+                    
+                    // Position around the nav item
+                    microStar.style.left = `${centerX}px`;
+                    microStar.style.top = `${centerY}px`;
+                    
+                    // Match theme colors with slight variations
+                    microStar.style.backgroundColor = Math.random() > 0.5 ? 
+                        `hsl(${Math.random() * 60 + 240}, 100%, 80%)` : // Purple/blue
+                        `hsl(45, 80%, 75%)`; // Gold
+                    
+                    // Create a starburst effect outward from the center
+                    const angle = Math.random() * Math.PI * 2; // Random angle in radians
+                    const distance = Math.random() * 30 + 20; // Distance 20-50px
+                    
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    
+                    microStar.style.setProperty('--x', `${tx}px`);
+                    microStar.style.setProperty('--y', `${ty}px`);
+                    microStar.style.setProperty('--r', `${Math.random() * 360}deg`);
+                    
+                    // Add to ripple container (reusing the existing container)
+                    document.querySelector('.ripple-container').appendChild(microStar);
+                    
+                    // Quick animation for starburst effect
+                    microStar.style.animation = `particleDrift ${Math.random() * 0.4 + 0.3}s ease-out forwards`;
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        if (microStar && microStar.parentNode) {
+                            microStar.parentNode.removeChild(microStar);
+                        }
+                    }, 800);
+                }
+            }
+            
+            // --- COSMIC RIPPLE EFFECT ---
+            const rippleContainer = document.querySelector('.ripple-container');
+            let mouseX = 0, mouseY = 0;
+            let rippleTimeout;
+            
+            // Track mouse position
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                
+                // Create ripple with throttling to avoid too many ripples
+                clearTimeout(rippleTimeout);
+                rippleTimeout = setTimeout(() => createRipple(e), 50);
+                
+                // Create small particles occasionally
+                if (Math.random() > 0.85) {
+                    createCosmicParticles(e.clientX, e.clientY);
+                }
+            });
+            
+            function createRipple(e) {
+                // Create the ripple element
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                
+                // Random size variation for natural feel
+                const size = Math.random() * 100 + 100; // 100-200px
+                
+                // Position the ripple at cursor
+                ripple.style.width = `${size}px`;
+                ripple.style.height = `${size}px`;
+                ripple.style.left = `${e.clientX - size/2}px`;
+                ripple.style.top = `${e.clientY - size/2}px`;
+                
+                // Add color variation for space theme
+                const hue = Math.random() * 60 + 240; // Blue to purple range
+                ripple.style.background = `radial-gradient(
+                    circle, 
+                    hsla(${hue}, 80%, 70%, 0.3) 0%, 
+                    hsla(${hue}, 70%, 60%, 0.2) 40%, 
+                    hsla(${hue}, 60%, 50%, 0) 70%
+                )`;
+                
+                // Add ripple to container
+                rippleContainer.appendChild(ripple);
+                
+                // Animate ripple
+                ripple.style.animation = `rippleEffect ${Math.random() * 0.5 + 1}s ease-out`;
+                
+                // Remove ripple after animation
+                setTimeout(() => {
+                    if (ripple && ripple.parentNode) {
+                        ripple.parentNode.removeChild(ripple);
+                    }
+                }, 2000);
+            }
+            
+            function createCosmicParticles(x, y) {
+                // Create 3-7 particles
+                const particleCount = Math.floor(Math.random() * 5) + 3;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'cosmic-particle';
+                    
+                    // Random size (1-3px)
+                    const size = Math.random() * 2 + 1;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // Position at cursor
+                    particle.style.left = `${x}px`;
+                    particle.style.top = `${y}px`;
+                    
+                    // Randomize particle color for space theme
+                    const particleType = Math.random();
+                    if (particleType > 0.7) {
+                        // Purple/blue particles (AURA theme)
+                        particle.style.backgroundColor = `hsl(${Math.random() * 60 + 240}, 100%, ${Math.random() * 20 + 70}%)`;
+                    } else if (particleType > 0.3) {
+                        // White/blue stars
+                        particle.style.backgroundColor = `hsl(220, ${Math.random() * 30}%, 90%)`;
+                    } else {
+                        // Gold accent particles
+                        particle.style.backgroundColor = `hsl(45, 80%, ${Math.random() * 20 + 60}%)`;
+                    }
+                    
+                    // Set random drift direction and rotation
+                    const tx = (Math.random() - 0.5) * 100; // -50px to 50px
+                    const ty = (Math.random() - 0.5) * 100;
+                    const tr = Math.random() * 360; // 0-360deg rotation
+                    
+                    particle.style.setProperty('--x', `${tx}px`);
+                    particle.style.setProperty('--y', `${ty}px`);
+                    particle.style.setProperty('--r', `${tr}deg`);
+                    
+                    // Add to container
+                    rippleContainer.appendChild(particle);
+                    
+                    // Animate with variable duration
+                    particle.style.animation = `particleDrift ${Math.random() * 1 + 0.5}s ease-out forwards`;
+                    
+                    // Remove particle after animation
+                    setTimeout(() => {
+                        if (particle && particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 1500);
+                }
+            }
+            
+            // Add special effect on click for more dramatic ripples
+            document.addEventListener('click', (e) => {
+                // Create a larger ripple on click
+                const clickRipple = document.createElement('div');
+                clickRipple.className = 'ripple';
+                
+                const clickSize = Math.random() * 150 + 200; // Larger ripple: 200-350px
+                
+                clickRipple.style.width = `${clickSize}px`;
+                clickRipple.style.height = `${clickSize}px`;
+                clickRipple.style.left = `${e.clientX - clickSize/2}px`;
+                clickRipple.style.top = `${e.clientY - clickSize/2}px`;
+                
+                // More vibrant color for click ripple
+                clickRipple.style.background = `radial-gradient(
+                    circle, 
+                    rgba(216, 180, 254, 0.4) 0%, 
+                    rgba(165, 180, 252, 0.3) 40%, 
+                    rgba(255, 255, 255, 0) 70%
+                )`;
+                
+                rippleContainer.appendChild(clickRipple);
+                clickRipple.style.animation = `rippleEffect 1.5s ease-out`;
+                
+                // Create more particles on click
+                createCosmicParticles(e.clientX, e.clientY);
+                createCosmicParticles(e.clientX, e.clientY);
+                
+                setTimeout(() => {
+                    if (clickRipple && clickRipple.parentNode) {
+                        clickRipple.parentNode.removeChild(clickRipple);
+                    }
+                }, 1500);
+            });
         });
     </script>
 </body>

@@ -21,6 +21,63 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        /* Team Card 3D Flip Animation */
+        .team-card {
+            perspective: 1200px;
+        }
+        .team-card-inner {
+            transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+        .team-card:hover .team-card-inner {
+            transform: rotateY(180deg);
+        }
+        .team-card-front, .team-card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .team-card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #a5b4fc33 0%, #d8b4fe22 100%);
+            color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 40px 0 rgba(165,180,252,0.18), 0 3px 16px 0 rgba(216,180,254,0.18);
+            padding: 2rem;
+        }
+        /* Team Section Animations */
+        .team-card {
+            box-shadow: 0 4px 32px 0 rgba(165,180,252,0.08), 0 1.5px 8px 0 rgba(216,180,254,0.10);
+            transform: translateY(40px) scale(0.97);
+            opacity: 0;
+            transition: box-shadow 0.4s, transform 0.5s cubic-bezier(0.19,1,0.22,1), opacity 0.7s;
+        }
+        .team-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1.03);
+            box-shadow: 0 8px 40px 0 rgba(165,180,252,0.18), 0 3px 16px 0 rgba(216,180,254,0.18);
+        }
+        .team-card:hover {
+            box-shadow: 0 12px 60px 0 rgba(165,180,252,0.25), 0 6px 32px 0 rgba(216,180,254,0.22);
+            transform: translateY(-8px) scale(1.06) rotate(-1deg);
+        }
+        .team-img {
+            filter: grayscale(30%) brightness(1.1);
+        }
+        .team-card:hover .team-img {
+            filter: grayscale(0%) brightness(1.2) drop-shadow(0 0 16px #a5b4fc88);
+        }
+        .team-name {
+            letter-spacing: 0.02em;
+            transition: text-shadow 0.4s;
+        }
+        .team-card:hover .team-name {
+            text-shadow: 0 2px 16px #a5b4fc88, 0 0 8px #d8b4fe88;
+        }
         /* Custom styles for the spatial theme */
         body {
             font-family: 'Inter', sans-serif;
@@ -266,7 +323,8 @@
             <nav class="hidden md:flex items-center space-x-8">
                 <a href="#collection" class="hover:text-white">Collection</a>
                 <a href="#philosophy" class="hover:text-white">Philosophy</a>
-                <a href="#lab" class="hover:text-white">Lab</a>
+                <a href="#about" class="hover:text-white">About</a>
+                <a href="#team" class="hover:text-white">Team</a>
             </nav>
             <a href="#" class="hidden md:block bg-white text-black font-semibold px-6 py-3 rounded-full btn-premium">Shop Now</a>
             <button id="mobile-menu-button" class="md:hidden text-white text-2xl z-50">
@@ -284,7 +342,8 @@
     <div id="mobile-menu" class="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-lg z-40 flex flex-col items-center justify-center space-y-8 text-2xl transform translate-x-full transition-transform duration-500 ease-in-out md:hidden">
         <a href="#collection" class="mobile-link">Collection</a>
         <a href="#philosophy" class="mobile-link">Philosophy</a>
-        <a href="#lab" class="mobile-link">Lab</a>
+        <a href="#about" class="mobile-link">About</a>
+        <a href="#team" class="mobile-link">Team</a>
         <a href="#" class="bg-white text-black font-semibold px-8 py-4 rounded-full mt-8">Shop Now</a>
     </div>
 
@@ -407,17 +466,98 @@
             </div>
         </section>
 
-        <!-- Lab Section -->
-        <section id="lab" class="py-20 md:py-32">
-            <div class="container mx-auto px-6 text-center">
-                <div class="reveal">
-                    <h2 class="text-4xl md:text-6xl font-bold mb-4">The Visionary Lab</h2>
-                    <p class="text-lg text-gray-400 max-w-2xl mx-auto mb-8">
-                        Innovation is at our core. We're currently developing a revolutionary way to experience eyewear online. This is where the future of vision is being built.
-                    </p>
-                    <div class="bg-[#08070d] p-8 md:p-16 rounded-lg border border-purple-400/20 inline-block shadow-2xl shadow-purple-900/20">
-                        <p class="text-2xl font-semibold text-white">Project: Chimera</p>
-                        <p class="text-gray-400 mt-2">Coming Soon.</p>
+        <!-- About Section (from index2.html) -->
+        <section id="about" class="relative min-h-[80vh] flex items-center bg-gradient-to-br from-[#0a0f1c] to-[#1a2150] overflow-hidden">
+            <div class="absolute inset-0 z-0 pointer-events-none">
+                <canvas id="about-orbit-canvas" class="w-full h-full"></canvas>
+            </div>
+            <div class="container mx-auto px-6 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 py-20">
+                <div class="max-w-xl w-full text-left">
+                    <h2 class="text-5xl md:text-6xl font-extrabold mb-4 text-white tracking-wider" style="letter-spacing:0.04em;">About AURA</h2>
+                    <h3 class="text-2xl md:text-3xl font-semibold mb-4 text-blue-200 underline underline-offset-4 decoration-blue-400">Pioneering The Future of Vision</h3>
+                    <p class="text-lg md:text-xl text-gray-200 mb-4">Founded in 2023, AURA emerged from a simple belief: eyewear should transcend function to become an expression of identity. Our team of visionary designers and optical engineers blend cutting-edge technology with timeless aesthetics.</p>
+                    <p class="text-lg md:text-xl text-gray-200 mb-8">We believe eyewear is an extension of the self. It's not just about seeing, but about how you want to be seen. AURA is committed to craftsmanship, innovation, and a design ethos that looks to the future without forgetting the elegance of the past.</p>
+                    <div class="flex flex-col sm:flex-row gap-6">
+                        <div class="bg-[#181e3a]/80 rounded-xl p-6 min-w-[140px] text-center border border-blue-400/20">
+                            <div class="text-3xl md:text-4xl font-extrabold text-white mb-1">24</div>
+                            <div class="uppercase text-xs text-blue-200 tracking-widest">Countries</div>
+                        </div>
+                        <div class="bg-[#181e3a]/80 rounded-xl p-6 min-w-[140px] text-center border border-blue-400/20">
+                            <div class="text-3xl md:text-4xl font-extrabold text-white mb-1">85</div>
+                            <div class="uppercase text-xs text-blue-200 tracking-widest">Design Awards</div>
+                        </div>
+                        <div class="bg-[#181e3a]/80 rounded-xl p-6 min-w-[140px] text-center border border-blue-400/20">
+                            <div class="text-3xl md:text-4xl font-extrabold text-white mb-1">12</div>
+                            <div class="uppercase text-xs text-blue-200 tracking-widest">Patents</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block flex-1 relative min-h-[400px]">
+                    <div id="about-orbit-3d" class="absolute inset-0 w-full h-full"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+         
+        <!-- Team Section -->
+        <section id="team" class="py-20 md:py-32 bg-[#08070d]">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 reveal">
+                    <h2 class="text-4xl md:text-6xl font-bold mb-4 gradient-text">Meet Our Team</h2>
+                    <p class="text-lg text-gray-400 max-w-2xl mx-auto">Visionaries, creators, and artisans behind AURA's journey to the future of eyewear.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
+                    <!-- Team Member 1 -->
+                    <div class="reveal team-card bg-black/60 rounded-xl p-0 flex items-center border border-white/10 shadow-xl hover:shadow-purple-400/20 transition-shadow duration-300 relative min-h-[370px]">
+                        <div class="team-card-inner w-full h-full relative" style="min-height:370px;">
+                            <div class="team-card-front w-full h-full flex flex-col items-center justify-center p-8">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Ethan Ray" class="w-28 h-28 rounded-full border-4 border-purple-400 mb-6 object-cover shadow-lg team-img">
+                                <h3 class="text-2xl font-semibold mb-1 gradient-text team-name">Ethan Ray</h3>
+                                <p class="text-purple-300 font-medium mb-2">Founder & Vision Director</p>
+                                <p class="text-gray-400 text-center text-base">Leads AURA with a passion for innovation and a relentless pursuit of clarity in design.</p>
+                            </div>
+                            <div class="team-card-back w-full h-full flex flex-col items-center justify-center p-8">
+                                <h3 class="text-2xl font-bold mb-2 gradient-text">Ethan Ray</h3>
+                                <p class="text-lg text-purple-200 mb-2">"Vision is the art of seeing what is invisible to others."</p>
+                                <span class="block w-16 h-1 bg-gradient-to-r from-purple-400 via-indigo-400 to-pink-400 rounded-full mb-4"></span>
+                                <p class="text-base text-gray-200">Ethan is the creative force behind AURA, blending technology and artistry to redefine modern eyewear.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Team Member 2 -->
+                    <div class="reveal team-card bg-black/60 rounded-xl p-0 flex items-center border border-white/10 shadow-xl hover:shadow-purple-400/20 transition-shadow duration-300 relative min-h-[370px]">
+                        <div class="team-card-inner w-full h-full relative" style="min-height:370px;">
+                            <div class="team-card-front w-full h-full flex flex-col items-center justify-center p-8">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Maya Lin" class="w-28 h-28 rounded-full border-4 border-purple-400 mb-6 object-cover shadow-lg team-img">
+                                <h3 class="text-2xl font-semibold mb-1 gradient-text team-name">Maya Lin</h3>
+                                <p class="text-purple-300 font-medium mb-2">Lead Designer</p>
+                                <p class="text-gray-400 text-center text-base">Shapes the future of eyewear with a blend of artistry, technology, and sustainability.</p>
+                            </div>
+                            <div class="team-card-back w-full h-full flex flex-col items-center justify-center p-8">
+                                <h3 class="text-2xl font-bold mb-2 gradient-text">Maya Lin</h3>
+                                <p class="text-lg text-purple-200 mb-2">"Design is intelligence made visible."</p>
+                                <span class="block w-16 h-1 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 rounded-full mb-4"></span>
+                                <p class="text-base text-gray-200">Maya crafts each frame with a vision for sustainability and a passion for futuristic aesthetics.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Team Member 3 -->
+                    <div class="reveal team-card bg-black/60 rounded-xl p-0 flex items-center border border-white/10 shadow-xl hover:shadow-purple-400/20 transition-shadow duration-300 relative min-h-[370px]">
+                        <div class="team-card-inner w-full h-full relative" style="min-height:370px;">
+                            <div class="team-card-front w-full h-full flex flex-col items-center justify-center p-8">
+                                <img src="https://randomuser.me/api/portraits/men/85.jpg" alt="Luca Moretti" class="w-28 h-28 rounded-full border-4 border-purple-400 mb-6 object-cover shadow-lg team-img">
+                                <h3 class="text-2xl font-semibold mb-1 gradient-text team-name">Luca Moretti</h3>
+                                <p class="text-purple-300 font-medium mb-2">Materials Engineer</p>
+                                <p class="text-gray-400 text-center text-base">Pioneers advanced materials for comfort, durability, and a distinct AURA feel.</p>
+                            </div>
+                            <div class="team-card-back w-full h-full flex flex-col items-center justify-center p-8">
+                                <h3 class="text-2xl font-bold mb-2 gradient-text">Luca Moretti</h3>
+                                <p class="text-lg text-purple-200 mb-2">"Innovation distinguishes between a leader and a follower."</p>
+                                <span class="block w-16 h-1 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 rounded-full mb-4"></span>
+                                <p class="text-base text-gray-200">Luca engineers the future of eyewear with cutting-edge materials and a relentless drive for excellence.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -439,6 +579,93 @@
     </footer>
 
     <script>
+
+        // --- ABOUT ORBIT 3D PLANET/ELECTRON ANIMATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('about-orbit-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let width, height, centerX, centerY, dpr = window.devicePixelRatio || 1;
+            function resize() {
+                width = canvas.offsetWidth * dpr;
+                height = canvas.offsetHeight * dpr;
+                canvas.width = width;
+                canvas.height = height;
+                centerX = width * 0.65;
+                centerY = height * 0.55;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            // Orbit parameters
+            const orbits = [
+                { r: 120, speed: 0.7, color: 'rgba(100,150,255,0.18)' },
+                { r: 180, speed: 0.45, color: 'rgba(100,150,255,0.12)' },
+                { r: 240, speed: 0.25, color: 'rgba(100,150,255,0.08)' }
+            ];
+            const planets = [
+                { r: 120, size: 14, color: '#5ee7ff', offset: 0 },
+                { r: 180, size: 10, color: '#a5b4fc', offset: Math.PI/2 },
+                { r: 240, size: 8, color: '#d8b4fe', offset: Math.PI }
+            ];
+            let t0 = performance.now();
+            function draw() {
+                ctx.clearRect(0,0,width,height);
+                // Draw stars
+                for(let i=0;i<120;i++){
+                    const x = Math.random()*width, y = Math.random()*height;
+                    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                    ctx.beginPath(); ctx.arc(x,y,Math.random()*1.2+0.2,0,2*Math.PI); ctx.fill();
+                }
+                // Draw orbits
+                orbits.forEach(orbit => {
+                    ctx.save();
+                    ctx.strokeStyle = orbit.color;
+                    ctx.lineWidth = 1.2;
+                    ctx.beginPath();
+                    ctx.ellipse(centerX, centerY, orbit.r*1.2, orbit.r, 0, 0, 2*Math.PI);
+                    ctx.stroke();
+                    ctx.restore();
+                });
+                // Draw nucleus
+                ctx.save();
+                ctx.shadowColor = '#5ee7ff';
+                ctx.shadowBlur = 40;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 38, 0, 2*Math.PI);
+                ctx.fillStyle = 'radial-gradient(circle at center, #5ee7ff 0%, #1a2150 100%)';
+                ctx.fillStyle = '#1a2150';
+                ctx.globalAlpha = 0.95;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 24, 0, 2*Math.PI);
+                ctx.fillStyle = '#5ee7ff';
+                ctx.globalAlpha = 0.18;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+                ctx.restore();
+                // Animate planets
+                let now = performance.now();
+                planets.forEach((planet,i) => {
+                    const angle = ((now-t0)/1000)*orbits[i].speed + planet.offset;
+                    const x = centerX + Math.cos(angle)*orbits[i].r*1.2;
+                    const y = centerY + Math.sin(angle)*orbits[i].r;
+                    ctx.save();
+                    ctx.shadowColor = planet.color;
+                    ctx.shadowBlur = 18;
+                    ctx.beginPath();
+                    ctx.arc(x, y, planet.size, 0, 2*Math.PI);
+                    ctx.fillStyle = planet.color;
+                    ctx.globalAlpha = 0.95;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                    ctx.restore();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             gsap.registerPlugin(ScrollTrigger);
